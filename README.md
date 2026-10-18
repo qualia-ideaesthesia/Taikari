@@ -118,8 +118,3 @@ config.example.py       # template for the optional local config
 - Original project: [Lost-MSth/Arcaea-server](https://github.com/Lost-MSth/Arcaea-server)
 - Song database: [ArcaeaSongDatabase](https://github.com/Arcaea-Infinity/ArcaeaSongDatabase)
   and [its fork](https://github.com/CuSO4Deposit/ArcaeaSongDatabase)
-  (song data is not provided since v2.9)
-
-## License
-
-[MIT](LICENSE) © Lost
