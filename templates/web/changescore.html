@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}Change the scores{% endblock %}
+
+{% block content %}
+<form class="form-block" action="/web/changescore/delete" method="post">
+    <h2 class="form-title">Delete the scores</h2>
+
+    <label for="sid">SID of the song</label>
+    <input name="sid" id="sid">
+
+    <label for="difficulty">Difficulty</label>
+    <select name="difficulty" id="difficulty">
+        <option value="-1" selected>All</option>
+        <option value="0">Past</option>
+        <option value="1">Present</option>
+        <option value="2">Future</option>
+        <option value="3">Beyond</option>
+        <option value="4">Eternal</option>
+    </select>
+
+    <label for="name">Arcaea Username</label>
+    <input name="name" id="name">
+
+    <div class="field-or">or</div>
+
+    <label for="user_code">Arcaea User Code</label>
+    <input name="user_code" id="user_code">
+
+    <div class="form-hint">The above three are query parameters. If they are left blank, they are considered all.
+        However, if you don't fill in all of them, it's wrong.</div>
+
+    <input type="submit" value="Delete">
+</form>
+
+{% endblock %}

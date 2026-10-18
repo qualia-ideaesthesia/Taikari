@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}All purchases{% endblock %}
+
+{% block content %}
+{% if posts %}
+<div class="card-list">
+    {% for item in posts %}
+    <div class="data-card">
+        <div class="info-row">
+            <span class="field-label">Name</span>
+            <span class="field-value strong">{{ item['purchase_name'] }}</span>
+        </div>
+        <div class="info-row">
+            <span class="field-label">Price</span>
+            <span class="field-value">{{ item['price'] }}</span>
+        </div>
+        <div class="info-row">
+            <span class="field-label">Original price</span>
+            <span class="field-value">{{ item['orig_price'] }}</span>
+        </div>
+        <div class="info-row">
+            <span class="field-label">Discount from</span>
+            <span class="field-value">{{ item['discount_from'] }}</span>
+        </div>
+        <div class="info-row">
+            <span class="field-label">Discount to</span>
+            <span class="field-value">{{ item['discount_to'] }}</span>
+        </div>
+        <div class="info-row">
+            <span class="field-label">Purchase with exchange certificate</span>
+            <span class="field-value">{{ item['discount_reason'] }}</span>
+        </div>
+
+        {% if item.get('items') %}
+        <table class="item-table">
+            <thead>
+                <tr>
+                    <th>Item id</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for x in item['items'] %}
+                <tr>
+                    <td>{{ x['item_id'] }}</td>
+                    <td>{{ x['type'] }}</td>
+                    <td>{{ x['amount'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% endblock %}

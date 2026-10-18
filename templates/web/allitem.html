@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}All items{% endblock %}
+
+{% block content %}
+{% if posts %}
+<div class="card-list">
+    {% for item in posts %}
+    <div class="data-card">
+        <div class="info-row">
+            <span class="field-label">Id</span>
+            <span class="field-value strong">{{ item['item_id'] }}</span>
+        </div>
+        <div class="info-row">
+            <span class="field-label">Type</span>
+            <span class="field-value">{{ item['type'] }}</span>
+        </div>
+        <div class="info-row">
+            <span class="field-label">Is available</span>
+            <span class="field-value">{{ item['is_available'] }}</span>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Redeem — {{ code }}{% endblock %}
+
+{% block content %}
+{% if posts %}
+<div class="card-list">
+    {% for user in posts %}
+    <div class="player-card">
+        <div class="card-name">
+            {{ user['name'] }}
+            <span class="meta-tag">UID: {{ user['user_id'] }}</span>
+            <span class="meta-tag">User code: {{ user['user_code'] }}</span>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<a class="back-link" href="{{ url_for('index.all_redeem') }}">← Back to all redeem codes</a>
+
+{% endblock %}

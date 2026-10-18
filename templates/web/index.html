@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}Main Menu{% endblock %}
+
+{% block content %}
+
+<p class="lead">This is the background management assistance system of Arcaea Server, which can be used to do some
+    simple operations.</p>
+
+<!-- Game Section -->
+<section class="link-section">
+    <h2>Game</h2>
+    <div class="link-list">
+        <a href="{{ url_for('index.single_player_score') }}">Single player score query</a>
+        <a href="{{ url_for('index.single_player_ptt') }}">Single player PTT details</a>
+        <a href="{{ url_for('index.all_player') }}">All players</a>
+        <a href="{{ url_for('index.all_song') }}">All songs</a>
+        <a href="{{ url_for('index.all_character') }}">All characters</a>
+        <a href="{{ url_for('index.all_item') }}">All items</a>
+        <a href="{{ url_for('index.all_purchase') }}">All purchases</a>
+        <a href="{{ url_for('index.all_present') }}">All presents</a>
+        <a href="{{ url_for('index.all_redeem') }}">All redeem codes</a>
+        <a href="{{ url_for('index.single_chart_top') }}">Single chart top rankings</a>
+    </div>
+</section>
+
+<!-- System Section -->
+<section class="link-section">
+    <h2>System</h2>
+    <div class="link-list">
+        <a href="{{ url_for('index.update_database') }}">Update databases</a>
+        <a href="{{ url_for('index.edit_userpwd') }}">Change user password</a>
+        <a href="{{ url_for('index.ban_user') }}">Ban the user</a>
+        <a href="{{ url_for('index.change_score') }}">Delete scores</a>
+        <a href="{{ url_for('index.update_user_save') }}">Update user saves</a>
+        <a href="{{ url_for('index.change_song') }}">Change songs</a>
+        <a href="{{ url_for('index.change_character') }}">Change characters</a>
+        <a href="{{ url_for('index.change_item') }}">Change items</a>
+        <a href="{{ url_for('index.change_purchase') }}">Change purchases</a>
+        <a href="{{ url_for('index.change_purchase_item') }}">Change purchase items</a>
+        <a href="{{ url_for('index.change_user') }}">Change user information</a>
+        <a href="{{ url_for('index.change_user_purchase') }}">Change user purchase information</a>
+        <a href="{{ url_for('index.change_present') }}">Change presents</a>
+        <a href="{{ url_for('index.deliver_present') }}">Deliver presents</a>
+        <a href="{{ url_for('index.change_redeem') }}">Change redeem codes</a>
+    </div>
+</section>
+
+{% endblock %}

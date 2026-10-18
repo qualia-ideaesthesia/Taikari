@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}Change user information{% endblock %}
+
+{% block content %}
+<form class="form-block" action="/web/changeuser/edituser" method="post">
+    <h2 class="form-title">Edit the user</h2>
+
+    <label for="name">Arcaea Username</label>
+    <input name="name" id="name">
+
+    <div class="field-or">or</div>
+
+    <label for="user_code">Arcaea User Code</label>
+    <input name="user_code" id="user_code">
+
+    <label for="ticket">Memories</label>
+    <input name="ticket" id="ticket">
+
+    <div class="form-hint">If some things do not need to be modified, leave it blank.</div>
+    <div class="form-hint">At present, only memories can be modified.</div>
+
+    <input type="submit" value="Edit">
+</form>
+
+<form class="form-block" action="/web/changeuser/edituser" method="post">
+    <h2 class="form-title">Edit all the users</h2>
+
+    <label for="ticket_all">Memories</label>
+    <input name="ticket" id="ticket_all">
+
+    <input type="submit" value="Edit all">
+</form>
+
+{% endblock %}

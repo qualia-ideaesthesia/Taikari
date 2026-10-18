@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Update users' saves{% endblock %}
+
+{% block content %}
+<form class="form-block" action="/web/updateusersave" method="post">
+    <h2 class="form-title">Update one user's saves to the database</h2>
+
+    <label for="name">Arcaea Username</label>
+    <input name="name" id="name">
+
+    <div class="field-or">or</div>
+
+    <label for="user_code">Arcaea User Code</label>
+    <input name="user_code" id="user_code">
+
+    <input type="submit" value="Update">
+</form>
+
+<form class="form-block" action="/web/updateusersave" method="post">
+    <h2 class="form-title">Update all users' saves to the database</h2>
+
+    <input type="submit" value="Update all">
+
+    <p class="text-muted mt-sm">Here you can overlay the saves uploaded by users to best_score table. Please remember
+        that it is an overlay action, so scores will not be compared.</p>
+</form>
+
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Change the purchases{% endblock %}
+
+{% block content %}
+<form class="form-block" action="/web/changepurchase" method="post">
+    <h2 class="form-title">Add the purchase</h2>
+
+    <label for="purchase_name">Purchase name</label>
+    <input name="purchase_name" id="purchase_name" required>
+
+    <label for="price">Price</label>
+    <input name="price" id="price">
+
+    <label for="orig_price">Original price</label>
+    <input name="orig_price" id="orig_price">
+
+    <label for="discount_from">Discount from (HTML5 datetime-local)</label>
+    <input type="datetime-local" name="discount_from" id="discount_from">
+
+    <label for="discount_to">Discount to (HTML5 datetime-local)</label>
+    <input type="datetime-local" name="discount_to" id="discount_to">
+
+    <div class="form-caption">Whether it is allowed to purchase with Anniversary 5 ticket</div>
+    <div class="radio-group">
+        <label><input type="radio" name="discount_reason" value="0">No</label>
+        <label><input type="radio" name="discount_reason" value="anni5tix">Yes</label>
+    </div>
+
+    <div class="form-hint">Time filling is an HTML5 control.</div>
+    <input type="submit" value="Add">
+</form>
+
+<form class="form-block" action="/web/changepurchase/delete" method="post">
+    <h2 class="form-title">Delete the purchase</h2>
+
+    <label for="purchase_name_del">Purchase name</label>
+    <input name="purchase_name" id="purchase_name_del" required>
+
+    <input type="submit" value="Delete">
+</form>
+
+{% endblock %}

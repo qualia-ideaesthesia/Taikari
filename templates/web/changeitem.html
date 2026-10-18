@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}Change the items{% endblock %}
+
+{% block content %}
+<form class="form-block" action="/web/changeitem" method="post">
+    <h2 class="form-title">Add the item</h2>
+
+    <label for="item_id_add">ID of the item</label>
+    <input name="item_id" id="item_id_add" required>
+
+    <label for="type_add">Type</label>
+    <select name="type" id="type_add">
+        <option value='single' selected>Single</option>
+        <option value='pack'>Pack</option>
+        <option value='world_song'>World song</option>
+        <option value='character'>Character</option>
+    </select>
+
+    <div class="form-caption">Is available</div>
+    <div class="radio-group">
+        <label><input type="radio" name="is_available" checked value=1>True</label>
+        <label><input type="radio" name="is_available" value=0>False</label>
+    </div>
+
+    <input type="submit" value="Add">
+</form>
+
+<form class="form-block" action="/web/changeitem/delete" method="post">
+    <h2 class="form-title">Delete the item</h2>
+
+    <label for="item_id_del">ID of the item</label>
+    <input name="item_id" id="item_id_del" required>
+
+    <label for="type_del">Type</label>
+    <select name="type" id="type_del">
+        <option value='single' selected>Single</option>
+        <option value='pack'>Pack</option>
+        <option value='world_song'>World song</option>
+        <option value='character'>Character</option>
+    </select>
+
+    <input type="submit" value="Delete">
+</form>
+
+{% endblock %}

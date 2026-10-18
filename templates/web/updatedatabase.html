@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}Update databases{% endblock %}
+
+{% block content %}
+<form class="form-block" method="post" enctype="multipart/form-data">
+    <h2 class="form-title">Upload old database</h2>
+
+    <label for="file">Old database file (arcaea_database.db)</label>
+    <input type="file" name="file" id="file">
+
+    <input type="submit" value="Submit">
+
+    <p class="text-muted mt-sm">Here you can synchronize the old version of the database to the new version and refresh
+        the list of full characters owned by players.</p>
+
+    <div class="info-row">
+        <span class="field-label">Uploadable files</span>
+        <span class="field-value"><strong>arcaea_database.db</strong></span>
+    </div>
+
+    <p class="text-muted mt-sm">Data that does not exist in the new database will be added and existing duplicate data
+        will also be changed.</p>
+</form>
+
+<form class="form-block refresh-form" action="/web/updatedatabase/refreshsonghash" method="post">
+    <h2 class="form-title">Refresh songs' hash</h2>
+    <input type="submit" value="Refresh">
+    <p class="text-muted mt-sm">Here you can refresh the hash values of all files stored in the songs folder in the
+        database.<br>Purpose: deal with updating of song chart files.</p>
+</form>
+
+<form class="form-block refresh-form" action="/web/updatedatabase/refreshsongrating" method="post">
+    <h2 class="form-title">Refresh songs' rating</h2>
+    <input type="submit" value="Refresh">
+    <p class="text-muted mt-sm">Here you can refresh the ratings of all scores in the database.<br>Purpose: deal with
+        updating of song chart consts.</p>
+</form>
+
+<form class="form-block refresh-form" action="/web/updatedatabase/refreshsbundle" method="post">
+    <h2 class="form-title">Refresh content bundles</h2>
+    <input type="submit" value="Refresh">
+    <p class="text-muted mt-sm">Here you can refresh the information of all files stored in the bundle folder in
+        memory.<br>Purpose: deal with updating of content bundles.</p>
+</form>
+
+<form class="form-block refresh-form" action="/web/updatedatabase/refreshworldmap" method="post">
+    <h2 class="form-title">Refresh world maps</h2>
+    <input type="submit" value="Refresh">
+    <p class="text-muted mt-sm">Here you can refresh the information of all files stored in the map folder in
+        memory.<br>Purpose: deal with updating of world maps.</p>
+</form>
+
+{% endblock %}

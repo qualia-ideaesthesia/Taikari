@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Change the characters{% endblock %}
+
+{% block content %}
+<form class="form-block" action="/web/changesong/editchar" method="post">
+    <h2 class="form-title">Edit the character</h2>
+
+    <label for="char_id">ID of the character</label>
+    <input name="id" id="char_id" required>
+
+    <label for="level">Level</label>
+    <input name="level" id="level">
+
+    <label for="skill_id_sel">Skill id</label>
+    <select name="skill_id" id="skill_id_sel">
+        <option value="">— select —</option>
+        {% for skill_id in skill_ids %}
+        <option value="{{ skill_id }}">{{ skill_id }}</option>
+        {% endfor %}
+    </select>
+
+    <label for="skill_id_uncap_sel">Uncapped skill id</label>
+    <select name="skill_id_uncap" id="skill_id_uncap_sel">
+        <option value="">— select —</option>
+        {% for skill_id in skill_ids %}
+        <option value="{{ skill_id }}">{{ skill_id }}</option>
+        {% endfor %}
+    </select>
+
+    <div class="form-hint">If some things do not need to be modified, leave it blank.</div>
+    <div class="form-hint">The character table will not be synchronized when updated.</div>
+
+    <input type="submit" value="Edit">
+</form>
+
+<form class="form-block" action="/web/changesong/updatechar" method="post">
+    <h2 class="form-title">Update the character</h2>
+    <p class="text-muted">Update all users' characters.</p>
+    <input type="submit" value="Update">
+</form>
+
+{% endblock %}

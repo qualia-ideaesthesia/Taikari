@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}All redeem codes{% endblock %}
+
+{% block content %}
+{% if posts %}
+<div class="card-list">
+    {% for redeem in posts %}
+    <div class="data-card">
+        <div class="info-row">
+            <span class="field-label">Code</span>
+            <span class="field-value strong">{{ redeem['code'] }}</span>
+        </div>
+
+        <div class="info-row">
+            <span class="field-label">Type</span>
+            <span class="field-value">
+                {% if redeem['type'] == 0 %}It can only be used once.
+                {% elif redeem['type'] == 1 %}Each user can only use it once.{% endif %}
+            </span>
+        </div>
+
+        {% if redeem.get('items') %}
+        <table class="item-table">
+            <thead>
+                <tr>
+                    <th>Item id</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for x in redeem['items'] %}
+                <tr>
+                    <td>{{ x['item_id'] }}</td>
+                    <td>{{ x['type'] }}</td>
+                    <td>{{ x['amount'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+
+        <a class="card-link" href="/web/redeem/{{ redeem['code'] }}">Players who have used it</a>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% endblock %}

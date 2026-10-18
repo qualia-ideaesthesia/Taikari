@@ -1,0 +1,240 @@
+import json
+from urllib.parse import parse_qs, urlparse
+
+from flask import Blueprint, jsonify, request
+from werkzeug.datastructures import ImmutableMultiDict
+
+from core.bundle import BundleDownload
+from core.config_manager import Config
+from core.character import UserCharacter
+from core.download import DownloadList
+from core.error import ArcError, RateLimit
+from core.item import ItemCharacter
+from core.notification import NotificationFactory
+from core.sql import Connect
+from core.system import GameInfo
+from core.user import UserOnline
+
+from .auth import auth_required
+from .func import arc_try, error_return, success_return
+from .present import present_info
+from .purchase import bundle_bundle, bundle_pack, get_single
+from .score import song_score_friend
+from .user import user_me
+from .world import world_all
+
+bp = Blueprint('others', __name__)
+
+
+@bp.route('/game/info', methods=['GET'])  # system info
+def game_info():
+    return success_return(GameInfo().to_dict())
+
+
+@bp.route('/notification/me', methods=['GET'])  # notification
+@auth_required(request)
+@arc_try
+def notification_me(user_id):
+    with Connect(in_memory=True) as c_m:
+        x = NotificationFactory(c_m, UserOnline(c_m, user_id))
+        return success_return([i.to_dict() for i in x.get_notification()])
+
+
+@bp.route('/game/content_bundle', methods=['GET'])  # hot update
+@arc_try
+def game_content_bundle():
+    # error code 5, 9 work
+    app_version = request.headers.get('AppVersion')
+    bundle_version = request.headers.get('ContentBundle')
+    device_id = request.headers.get('DeviceId')
+    with Connect(in_memory=True) as c_m:
+        x = BundleDownload(c_m)
+        x.set_client_info(app_version, bundle_version, device_id)
+        return success_return({
+            'orderedResults': x.get_bundle_list()
+        })
+
+
+@bp.route('/serve/download/me/song', methods=['GET'])  # song download
+@auth_required(request)
+@arc_try
+def download_song(user_id):
+    with Connect(in_memory=True) as c_m:
+        with Connect() as c:
+            x = DownloadList(c_m, UserOnline(c, user_id))
+            x.song_ids = request.args.getlist('sid')
+            x.url_flag = json.loads(request.args.get('url', 'true'))
+            if x.url_flag and x.is_limited:
+                raise RateLimit('You have reached the download limit.', 903)
+
+            x.add_songs()
+            return success_return(x.urls)
+
+
+@bp.route('/finale/progress', methods=['GET'])
+def finale_progress():
+    # world boss health bar
+    return success_return({'percentage': 100000})
+
+
+@bp.route('/finale/finale_start', methods=['POST'])
+@auth_required(request)
+@arc_try
+def finale_start(user_id):
+    # testify starts, goodbye Tairitsu
+    # but Tairitsu won't say goodbye
+
+    with Connect() as c:
+        item = ItemCharacter(c)
+        item.set_id('55')  # Hikari (Fatalis)
+        item.user_claim_item(UserOnline(c, user_id))
+        return success_return({})
+
+
+@bp.route('/finale/finale_end', methods=['POST'])
+@auth_required(request)
+@arc_try
+def finale_end(user_id):
+
+    with Connect() as c:
+        item = ItemCharacter(c)
+        item.set_id('5')  # Hikari & Tairitsu (Reunion)
+        item.user_claim_item(UserOnline(c, user_id))
+        return success_return({})
+
+
+@bp.route('/insight/me/complete/<string:pack_id>', methods=['POST'])
+@auth_required(request)
+@arc_try
+def insight_complete(user_id, pack_id):
+    # insight state change
+    with Connect() as c:
+        u = UserOnline(c, user_id)
+        if pack_id == 'eden_append_1':
+            item = ItemCharacter(c)
+            item.set_id('72')  # Insight (Ascendant - 8th Seeker)
+            item.user_claim_item(u)
+            u.update_user_one_column('insight_state', 1)
+        elif pack_id == 'lephon':
+            u.update_user_one_column('insight_state', 3)
+            c.execute('''update user_world_map set lephon_nell_state = :y where user_id = :x''', {'x': user_id, 'y': 4})
+        else:
+            raise ArcError('Invalid pack_id', 151, status=404)
+
+        return success_return({
+            'insight_state': u.insight_state
+        })
+
+
+@bp.route('/unlock/me/awaken_maya', methods=['POST'])
+@auth_required(request)
+@arc_try
+def awaken_maya(user_id):
+    with Connect() as c:
+        ch = UserCharacter(c, 71, UserOnline(c, user_id))
+        ch.select_character_info()
+        try:
+            ch.character_uncap()
+            # ensure no error raised
+        except ArcError:
+            pass
+
+        return success_return({
+            'user_id': user_id,
+            'updated_characters': [ch.to_dict()]
+        })
+
+
+@bp.route('/unlock/me/konzetsu_saya', methods=['POST'])
+@auth_required(request)
+@arc_try
+def konzetsu_saya(user_id):
+    with Connect() as c:
+        item = ItemCharacter(c)
+        item.set_id('97')  # Saya (Absolution)
+        item.user_claim_item(UserOnline(c, user_id))
+        user = UserOnline(c, user_id)
+        user.select_user()
+        user.select_characters()
+        user.characters.select_characters_info()
+        return success_return({
+            'characters': [i.to_dict() for i in user.characters.characters]
+        })
+
+@bp.route('/unlock/me/konzetsu_insight', methods=['POST'])
+@auth_required(request)
+@arc_try
+def konzetsu_insight(user_id):
+    with Connect() as c:
+        item = ItemCharacter(c)
+        item.set_id('98')  # Insight (Nullified)
+        item.user_claim_item(UserOnline(c, user_id))
+        user = UserOnline(c, user_id)
+        user.select_user()
+        user.select_characters()
+        user.characters.select_characters_info()
+        return success_return({
+            'characters': [i.to_dict() for i in user.characters.characters]
+        })
+
+
+@bp.route('/applog/me/log', methods=['POST'])
+def applog_me():
+    # exception log, not handled
+    return success_return({})
+
+
+map_dict = {
+    '/user/me': user_me,
+    '/purchase/bundle/pack': bundle_pack,
+    '/serve/download/me/song': download_song,
+    '/game/info': game_info,
+    '/present/me': present_info,
+    '/world/map/me': world_all,
+    '/score/song/friend': song_score_friend,
+    '/purchase/bundle/bundle': bundle_bundle,
+    '/finale/progress': finale_progress,
+    '/purchase/bundle/single': get_single
+}
+
+
+@bp.route('/compose/aggregate', methods=['GET'])  # aggregate request
+def aggregate():
+    try:
+        # global request
+        finally_response = {'success': True, 'value': []}
+        # request_ = request
+        get_list = json.loads(request.args.get('calls'))
+        if len(get_list) > 10:
+            # too many requests, reject
+            return error_return()
+
+        for i in get_list:
+            endpoint = i['endpoint']
+            request.args = ImmutableMultiDict(
+                {key: value[0] for key, value in parse_qs(urlparse(endpoint).query).items()})
+
+            resp_t = map_dict[urlparse(endpoint).path]()
+            if isinstance(resp_t, tuple):
+                # The response may be a tuple, if it is an error response
+                resp_t = resp_t[0]
+
+            if hasattr(resp_t, "response"):
+                resp_t = resp_t.response[0].decode().rstrip('\n')
+            resp = json.loads(resp_t)
+
+            if hasattr(resp, 'get') and resp.get('success') is False:
+                finally_response = {'success': False, 'error_code': resp.get(
+                    'error_code'), 'id': i['id']}
+                if "extra" in resp:
+                    finally_response['extra'] = resp['extra']
+                # request = request_
+                return jsonify(finally_response)
+
+            finally_response['value'].append(
+                {'id': i.get('id'), 'value': resp['value'] if hasattr(resp, 'get') else resp})
+
+        # request = request_
+        return jsonify(finally_response)
+    except KeyError:
+        return error_return()

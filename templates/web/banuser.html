@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}Ban the user{% endblock %}
+
+{% block content %}
+<form class="form-block" action="/web/banuser" method="post">
+    <h2 class="form-title">Ban the user</h2>
+
+    <label for="name">Arcaea Username</label>
+    <input name="name" id="name">
+
+    <div class="field-or">or</div>
+
+    <label for="user_code">Arcaea User Code</label>
+    <input name="user_code" id="user_code">
+
+    <div class="form-hint">Tip: Reset the user password to unseal the account.</div>
+
+    <input type="submit" value="Execute">
+</form>
+
+<form class="form-block" action="/web/banuser/deleteuserscore" method="post">
+    <h2 class="form-title">Delete all of the user's scores</h2>
+
+    <label for="name_2">Arcaea Username</label>
+    <input name="name" id="name_2">
+
+    <div class="field-or">or</div>
+
+    <label for="user_code_2">Arcaea User Code</label>
+    <input name="user_code" id="user_code_2">
+
+    <div class="form-hint warning">Warning! This operation is destructive and unrecoverable.</div>
+
+    <input type="submit" value="Execute">
+</form>
+
+{% endblock %}

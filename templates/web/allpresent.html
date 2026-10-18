@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}All presents{% endblock %}
+
+{% block content %}
+{% if posts %}
+<div class="card-list">
+    {% for present in posts %}
+    <div class="data-card">
+        <div class="info-row">
+            <span class="field-label">Id</span>
+            <span class="field-value strong">{{ present['present_id'] }}</span>
+        </div>
+        <div class="info-row">
+            <span class="field-label">Expire time</span>
+            <span class="field-value">{{ present['expire_ts'] }}</span>
+        </div>
+        <div class="info-row">
+            <span class="field-label">Description</span>
+            <span class="field-value">{{ present['description'] }}</span>
+        </div>
+
+        {% if present.get('items') %}
+        <table class="item-table">
+            <thead>
+                <tr>
+                    <th>Item id</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for x in present['items'] %}
+                <tr>
+                    <td>{{ x['item_id'] }}</td>
+                    <td>{{ x['type'] }}</td>
+                    <td>{{ x['amount'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% endblock %}

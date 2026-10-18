@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}Change the redeem codes{% endblock %}
+
+{% block content %}
+<form class="form-block" action="/web/changeredeem/addredeem" method="post">
+    <h2 class="form-title">Add the redeem</h2>
+
+    <div class="form-caption">Specify generation</div>
+
+    <label for="code">The redeem code</label>
+    <input name="code" id="code">
+
+    <div class="field-or">or</div>
+
+    <label for="redeem_amount">Redeem code amount (batch generate at random)</label>
+    <input name="redeem_amount" id="redeem_amount">
+
+    <div class="form-caption">Redeem code type</div>
+    <div class="radio-group">
+        <label><input type="radio" name="redeem_type" value="0" checked>It can only be used once.</label>
+        <label><input type="radio" name="redeem_type" value="1">Each user can only use it once.</label>
+    </div>
+
+    <label for="item_id">ID of the item</label>
+    <input name="item_id" id="item_id" required>
+
+    <label for="type">Type</label>
+    <select name="type" id="type">
+        <option value='single' selected>Single song</option>
+        <option value='pack'>Song pack</option>
+        <option value='world_song'>World song</option>
+        <option value='world_unlock'>World unlock scene</option>
+        <option value='character'>Character</option>
+        <option value='core'>Character core</option>
+        <option value='fragment'>Fragment</option>
+        <option value='memory'>Memory</option>
+        <option value='anni5tix'>Anniversary 5 ticket</option>
+        <option value='pick_ticket'>Pick ticket</option>
+    </select>
+
+    <label for="amount">Amount</label>
+    <input name="amount" id="amount" value="1" required>
+
+    <div class="form-hint">The length of redeem code is 10 ~ 20.</div>
+    <div class="form-hint">The amount of batch generation should not be more than 1000.</div>
+
+    <input type="submit" value="Add">
+</form>
+
+<form class="form-block" action="/web/changeredeem/deleteredeem" method="post">
+    <h2 class="form-title">Delete the redeem</h2>
+
+    <label for="code_del">The redeem code</label>
+    <input name="code" id="code_del" required>
+
+    <input type="submit" value="Delete">
+</form>
+
+{% endblock %}

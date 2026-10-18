@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% block title %}All characters{% endblock %}
+
+{% block content %}
+{% if posts %}
+<div class="card-list">
+    {% for char in posts %}
+    <div class="data-card">
+        <div class="info-row">
+            <span class="field-label">Id</span>
+            <span class="field-value">{{ char['character_id'] }}</span>
+        </div>
+        <div class="info-row">
+            <span class="field-label">Name</span>
+            <span class="field-value"><strong>{{ char['name'] }}</strong></span>
+        </div>
+        <div class="info-row">
+            <span class="field-label">Max level</span>
+            <span class="field-value">{{ char['max_level'] }}</span>
+        </div>
+
+        <table class="char-stats">
+            <thead>
+                <tr>
+                    <th>Level</th>
+                    <th>Frag</th>
+                    <th>Prog</th>
+                    <th>Overdrive</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>{{ char['frag1'] }}</td>
+                    <td>{{ char['prog1'] }}</td>
+                    <td>{{ char['overdrive1'] }}</td>
+                </tr>
+                <tr>
+                    <td>20</td>
+                    <td>{{ char['frag20'] }}</td>
+                    <td>{{ char['prog20'] }}</td>
+                    <td>{{ char['overdrive20'] }}</td>
+                </tr>
+                <tr>
+                    <td>30</td>
+                    <td>{{ char['frag30'] }}</td>
+                    <td>{{ char['prog30'] }}</td>
+                    <td>{{ char['overdrive30'] }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="info-row mt-sm">
+            <span class="field-label">Skill id</span>
+            <span class="field-value">{{ char['skill_id'] }}</span>
+        </div>
+        <div class="info-row">
+            <span class="field-label">Skill unlock level</span>
+            <span class="field-value">{{ char['skill_unlock_level'] }}</span>
+        </div>
+        <div class="info-row">
+            <span class="field-label">Uncapped skill id</span>
+            <span class="field-value">{{ char['skill_id_uncap'] }}</span>
+        </div>
+        <div class="info-row">
+            <span class="field-label">Is uncapped</span>
+            <span class="field-value">{{ char['is_uncapped'] }}</span>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% endblock %}

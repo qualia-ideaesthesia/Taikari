@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% block title %}All players{% endblock %}
+
+{% block content %}
+{% if posts %}
+<div class="card-list">
+    {% for user in posts %}
+    <div class="player-card clearfix">
+        <div class="card-name">
+            {{ user['name'] }}
+            <span class="meta-tag">UID: {{ user['user_id'] }}</span>
+            <span class="meta-tag">User code: {{ user['user_code'] }}</span>
+            {% if user['ban_flag'] %}<span class="meta-tag banned-badge">Banned</span>{% endif %}
+        </div>
+
+        <div class="card-join-date">Registered in: {{ user['join_date'] }}</div>
+
+        <div class="info-row">
+            <span class="field-label">PTT</span>
+            <span class="field-value ptt-value">{{ '%0.2f'|format(user['rating_ptt']/100|float) }}</span>
+        </div>
+        <div class="info-row">
+            <span class="field-label">Memories</span>
+            <span class="field-value ptt-value">{{ user['ticket'] }}</span>
+        </div>
+
+        {% if user.get('song_id') %}
+        <div class="recent-play clearfix">
+            <div class="form-caption">Recent plays</div>
+
+            <div class="badge-row mt-xs">
+                <span class="song-title">{{ user['song_id'] }}</span>
+                {% if user['difficulty'] == 0 %}<span class="diff-badge diff-pst">PST</span>
+                {% elif user['difficulty'] == 1 %}<span class="diff-badge diff-prs">PRS</span>
+                {% elif user['difficulty'] == 2 %}<span class="diff-badge diff-ftr">FTR</span>
+                {% else %}<span class="diff-badge diff-byd">BYD</span>{% endif %}
+            </div>
+
+            <table class="score-detail-table">
+                <tbody>
+                    <tr>
+                        <td>PURE:</td>
+                        <td>{{ user['perfect_count'] }} {{ '(' ~ user['shiny_perfect_count'] ~ ')' }}</td>
+                    </tr>
+                    <tr>
+                        <td>FAR:</td>
+                        <td>{{ user['near_count'] }}</td>
+                    </tr>
+                    <tr>
+                        <td>LOST:</td>
+                        <td>{{ user['miss_count'] }}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="score-score-val">{{ user['score'] }}</div>
+
+            {% if user['clear_type'] == 3 %}<span class="clear-type-label">Pure Memory</span>
+            {% elif user['clear_type'] == 2 %}<span class="clear-type-label">Full Recall</span>
+            {% elif user['clear_type'] == 5 %}<span class="clear-type-label">Hard Clear</span>
+            {% elif user['clear_type'] == 1 %}<span class="clear-type-label">Normal Clear</span>
+            {% elif user['clear_type'] == 4 %}<span class="clear-type-label">Easy Clear</span>
+            {% else %}<span class="clear-type-label">Track Lost</span>{% endif %}
+
+            <div class="rating-label">Rating: {{ user['rating'] }}</div>
+            <div class="date-label">{{ user['time_played'] }}</div>
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% endblock %}

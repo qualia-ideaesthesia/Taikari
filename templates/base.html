@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#131315" media="(prefers-color-scheme: dark)">
+    <title>{% block title %}{% endblock %} — Arcaea Server</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css', v='4') }}">
+</head>
+
+<body>
+
+    <header class="site-header" id="site-header">
+        <div class="header-inner">
+            <h1 class="site-title"><a href="{{ url_for('index.index') }}">Arcaea Server</a></h1>
+
+            <!-- Hamburger button (narrow screens) -->
+            <button id="nav-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false"
+                aria-controls="user-nav">
+                <span class="burger-line"></span>
+                <span class="burger-line"></span>
+                <span class="burger-line"></span>
+            </button>
+
+            <!-- User navigation -->
+            <nav id="user-nav" class="user-nav" aria-label="Account">
+                {% if g.user %}
+                <ul>
+                    <li><span>{{ g.user['username'] }}</span></li>
+                    <li><a href="{{ url_for('index.index') }}">Home</a></li>
+                    <li><a href="{{ url_for('login.logout') }}">Log Out</a></li>
+                </ul>
+                {% else %}
+                <ul>
+                    <li><a href="{{ url_for('login.login') }}">Log In</a></li>
+                </ul>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <main class="content">
+
+        <section class="page-header">
+            <h1>{% block page_title %}{{ self.title() }}{% endblock %}</h1>
+        </section>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="flash flash-{{ category }}" role="status">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+
+    </main>
+
+    <footer class="site-footer">
+        Arcaea Server — administration console
+    </footer>
+
+    <script>
+        (function () {
+            // Inject the CSRF token into every POST form on the page.
+            var csrfMeta = document.querySelector('meta[name="csrf-token"]');
+            if (csrfMeta) {
+                var csrfToken = csrfMeta.getAttribute('content');
+                var addToken = function (form) {
+                    if (!form || (form.method || 'get').toLowerCase() !== 'post') return;
+                    if (form.querySelector('input[name="_csrf_token"]')) return;
+                    var input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = '_csrf_token';
+                    input.value = csrfToken;
+                    form.appendChild(input);
+                };
+                Array.prototype.forEach.call(document.querySelectorAll('form'), addToken);
+                document.addEventListener('submit', function (e) {
+                    addToken(e.target);
+                }, true);
+            }
+
+            var toggle = document.getElementById('nav-toggle');
+            var nav = document.getElementById('user-nav');
+            var header = document.getElementById('site-header');
+
+            if (toggle && nav) {
+                toggle.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    var open = nav.classList.toggle('open');
+                    toggle.classList.toggle('open', open);
+                    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+                });
+
+                document.addEventListener('click', function (e) {
+                    if (!nav.classList.contains('open')) return;
+                    if (nav.contains(e.target) || toggle.contains(e.target)) return;
+                    nav.classList.remove('open');
+                    toggle.classList.remove('open');
+                    toggle.setAttribute('aria-expanded', 'false');
+                });
+            }
+
+            if (header) {
+                var onScroll = function () {
+                    header.classList.toggle('scrolled', window.scrollY > 4);
+                };
+                onScroll();
+                window.addEventListener('scroll', onScroll, { passive: true });
+            }
+
+            // Simple page-transition animation on internal navigation.
+            var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            if (!reduce) {
+                document.addEventListener('click', function (e) {
+                    if (e.defaultPrevented || e.button !== 0) return;
+                    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+                    var a = e.target.closest ? e.target.closest('a') : null;
+                    if (!a) return;
+                    var href = a.getAttribute('href');
+                    if (!href || href.charAt(0) === '#') return;
+                    if (a.target && a.target !== '_self') return;
+                    if (a.hasAttribute('download')) return;
+                    if (a.origin !== window.location.origin) return;
+                    e.preventDefault();
+                    document.body.classList.add('page-leaving');
+                    window.setTimeout(function () {
+                        window.location.href = a.href;
+                    }, 160);
+                });
+
+                window.addEventListener('pageshow', function () {
+                    document.body.classList.remove('page-leaving');
+                });
+            }
+        })();
+    </script>
+
+</body>
+
+</html>

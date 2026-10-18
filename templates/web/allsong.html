@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}All songs{% endblock %}
+
+{% block content %}
+{% if posts %}
+<div class="card-list">
+    {% for song in posts %}
+    <div class="data-card">
+        <div class="info-row">
+            <span class="field-label">Name</span>
+            <span class="field-value"><strong>{{ song['name_en'] }}</strong></span>
+        </div>
+        <div class="info-row">
+            <span class="field-label">Sid</span>
+            <span class="field-value song-title">{{ song['song_id'] }}</span>
+        </div>
+
+        {% if song.get('rating_pst') or song.get('rating_prs') or song.get('rating_ftr') or song.get('rating_byn') or
+        song.get('rating_etr') %}
+        <div class="rating-grid">
+            {% if song.get('rating_pst') %}
+            <span class="rating-item"><span class="diff-badge diff-pst">PST</span>{{ song['rating_pst'] }}</span>
+            {% endif %}
+            {% if song.get('rating_prs') %}
+            <span class="rating-item"><span class="diff-badge diff-prs">PRS</span>{{ song['rating_prs'] }}</span>
+            {% endif %}
+            {% if song.get('rating_ftr') %}
+            <span class="rating-item"><span class="diff-badge diff-ftr">FTR</span>{{ song['rating_ftr'] }}</span>
+            {% endif %}
+            {% if song.get('rating_byn') %}
+            <span class="rating-item"><span class="diff-badge diff-byd">BYD</span>{{ song['rating_byn'] }}</span>
+            {% endif %}
+            {% if song.get('rating_etr') %}
+            <span class="rating-item"><span class="diff-badge diff-etr">ETR</span>{{ song['rating_etr'] }}</span>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% endblock %}

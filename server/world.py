@@ -1,0 +1,56 @@
+from flask import Blueprint, request
+
+from core.sql import Connect
+from core.user import UserOnline
+from core.world import MapParser, UserMap
+
+from .auth import auth_required
+from .func import arc_try, success_return
+
+bp = Blueprint('world', __name__, url_prefix='/world')
+
+
+@bp.route('/map/me', methods=['GET'])  # Get world mode info, all maps
+@auth_required(request)
+@arc_try
+def world_all(user_id):
+    with Connect() as c:
+        user = UserOnline(c, user_id)
+        user.select_user()
+        user.select_user_about_current_map()
+
+        maps = []
+        for x in MapParser.get_world_all(c, user):
+            if x.map_id == 'lephon_nell' and user.lephon_nell_state == 4:
+                continue
+            maps.append(x.to_dict(has_map_info=True, has_rewards=True))
+
+        return success_return({
+            "current_map": user.current_map.map_id,
+            "user_id": user_id,
+            "maps": maps
+        })
+
+
+@bp.route('/map/me', methods=['POST'])  # Enter a map
+@auth_required(request)
+@arc_try
+def world_in(user_id):
+    with Connect() as c:
+        arcmap = UserMap(c, request.form['map_id'], UserOnline(c, user_id))
+        if arcmap.unlock():
+            return success_return(arcmap.to_dict())
+
+
+@bp.route('/map/me/<map_id>', methods=['GET'])  # Get complete info for a single map
+@auth_required(request)
+@arc_try
+def world_one(user_id, map_id):
+    with Connect() as c:
+        arcmap = UserMap(c, map_id, UserOnline(c, user_id))
+        arcmap.change_user_current_map()
+        return success_return({
+            "user_id": user_id,
+            "current_map": map_id,
+            "maps": [arcmap.to_dict(has_map_info=True, has_steps=True)]
+        })

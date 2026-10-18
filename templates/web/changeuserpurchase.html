@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}Change user purchase information{% endblock %}
+
+{% block content %}
+<form class="form-block" action="/web/changeuserpurchase/edituser" method="post">
+    <h2 class="form-title">Edit the user</h2>
+
+    <label for="name">Arcaea Username</label>
+    <input name="name" id="name">
+
+    <div class="field-or">or</div>
+
+    <label for="user_code">Arcaea User Code</label>
+    <input name="user_code" id="user_code">
+
+    <div class="form-caption">Operation to all singles and packs</div>
+    <div class="radio-group">
+        <label><input type="radio" name="method" value="0">Unlock</label>
+        <label><input type="radio" name="method" value="1">Lock</label>
+    </div>
+
+    <input type="submit" value="Execute">
+</form>
+
+<form class="form-block" action="/web/changeuserpurchase/edituser" method="post">
+    <h2 class="form-title">Edit all the users</h2>
+
+    <div class="form-caption">Operation to all singles and packs</div>
+    <div class="radio-group">
+        <label><input type="radio" name="method" value="0">Unlock</label>
+        <label><input type="radio" name="method" value="1">Lock</label>
+    </div>
+
+    <input type="submit" value="Execute">
+</form>
+
+{% endblock %}
