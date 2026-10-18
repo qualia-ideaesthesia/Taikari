@@ -14,57 +14,6 @@ Taikari is a study/research project. It is **not** affiliated with, endorsed by,
 connected to the official Arcaea service. Do not use it for any commercial
 purpose.
 
-## Features
-
-Legend: :x: not supported · :warning: possible issues / may differ from official ·
-:wastebasket: no longer maintained · :construction: in construction
-
-- Login and registration
-  - Auto-ban of multiple devices
-  - :warning: Multi-device login
-  - Login rate limit
-  - Register rate limit
-  - :warning: Account deletion
-- Score upload
-  - Score validation
-  - Score ranking
-- Potential (PTT)
-  - Best 30
-  - :warning: Recent Top 10
-- Global rank
-- Course (段位) system
-- :warning: Link Play 2.0
-- Friends
-  - :x: Max friend number increase
-- Cloud save
-  - Attempt to unlock all stories and songs
-- World mode
-  - Stamina system
-  - :warning: Normal steps boost & beyond boost
-  - :warning: Character skills
-- Song downloading
-  - :x: Encrypted downloading
-  - Download validation
-  - Download rate limit
-- Content bundle hot update
-- Purchase system
-  - Singles and packs
-  - :x: Pack bundles
-  - Discounts
-  - 5th anniversary ticket
-  - Pick ticket
-  - :x: Automatic Extend pack price reduction
-- Present system
-- Redeem code system
-- Newbie missions
-- Character system
-- Data recording
-  - Users' scores
-  - Users' daily potential
-- :wastebasket: Simple web admin backend
-- :construction: API
-- Server log
-
 ## Requirements
 
 - Windows / Linux / macOS / Android …
@@ -73,7 +22,6 @@ Legend: :x: not supported · :warning: possible issues / may differ from officia
   - `cryptography` >= 35.0.0
   - `limits` >= 2.7.0
 - A production WSGI server, e.g. `waitress` (default), `gunicorn`, or `gevent`
-- Optional: Charles / IDA / a proxy app for debugging the client
 
 ## Getting started
 
@@ -107,17 +55,6 @@ Legend: :x: not supported · :warning: possible issues / may differ from officia
 4. **Open the web admin panel**
 
    Browse to `http://<host>:8000` and log in with `USERNAME` / `PASSWORD`.
-
-## Configuration
-
-Configuration lives in `core/config_manager.py`. Almost anything can be
-overridden without editing that file:
-
-- Create `config.py` next to `main.py` (see `config.example.py`).
-- Or set `ARCAEA_SERVER_CONFIG` to the path of a Python config file.
-- Or set `ARCAEA_JSON_CONFIG_PATH` to a JSON file.
-
-Only the keys you define are applied; the rest keep their defaults.
 
 ### Important settings
 
@@ -182,7 +119,6 @@ config.example.py       # template for the optional local config
 - Song database: [ArcaeaSongDatabase](https://github.com/Arcaea-Infinity/ArcaeaSongDatabase)
   and [its fork](https://github.com/CuSO4Deposit/ArcaeaSongDatabase)
   (song data is not provided since v2.9)
-- Favicon: [black fate - てんてん - pixiv](https://www.pixiv.net/artworks/82374369)
 
 ## License
 
