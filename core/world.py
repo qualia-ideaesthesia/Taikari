@@ -425,7 +425,7 @@ class UserMap(Map):
             self.initialize()
 
         user_lephon_nell_state = self.user.lephon_nell_state
-        self.lephon_final = user_lephon_nell_state == 3
+        self.lephon_final = self.map_id == "lephon_nell" and user_lephon_nell_state == 3
         self.lephon_active = self.lephon_final
 
         if user_lephon_nell_state <= 3 and self.map_id == "lephon_nell":
@@ -435,6 +435,17 @@ class UserMap(Map):
             ]
 
         self.select_map_info()  # Update with overwrite_steps
+
+        # Entering the final phase uses a shorter step list than the previous
+        # phase. Rebase a position left over from the previous phase so the
+        # client never receives curr_position >= step_count.
+        if (
+            self.map_id == "lephon_nell"
+            and user_lephon_nell_state == 3
+            and self.curr_position >= self.step_count
+        ):
+            self.curr_position = 65
+            self.curr_capture = 1
 
     def change_user_current_map(self):
         """Change the user's current map to this map"""
@@ -449,21 +460,82 @@ class UserMap(Map):
         self.select()
 
         if self.is_locked:
+            if not self.server_requirements_met():
+                return False
             self.is_locked = False
             self.curr_position = 0
             self.curr_capture = 0
-            self.select_map_info()
-            if self.require_type is not None and self.require_type != "":
-                if self.require_type in ["pack", "single"]:
-                    item = ItemFactory(self.c).get_item(self.require_type)
-                    item.item_id = self.require_id
-                    item.select_user_item(self.user)
-                    if not item.amount:
-                        self.is_locked = True
-
             self.update()
 
         return not self.is_locked
+
+    def server_requirements_met(self) -> bool:
+        """Check authoritative requirements; local client gates remain local.
+
+        Android 0x19c6310 / iOS 0x1000352b8 require every main row
+        and at least one alternative row. A present empty requires array
+        deliberately suppresses legacy fields.
+        """
+        requirements = self.requires
+        if requirements is None:
+            requirements = []
+            if self.require_type:
+                if self.require_type in ('fragment', 'chapter_step', 'chapter_maps'):
+                    requirements.append({'type': self.require_type, 'value': self.require_value})
+                else:
+                    identifiers = self.require_id if isinstance(self.require_id, list) else [self.require_id]
+                    requirements.extend({'type': self.require_type, 'id': identifier}
+                                        for identifier in identifiers)
+        if any(self.server_requirement_met(row) is False for row in requirements):
+            return False
+        alternatives = self.requires_any or []
+        return not alternatives or any(self.server_requirement_met(row) is not False
+                                       for row in alternatives)
+
+    def server_requirement_met(self, requirement: dict) -> 'bool | None':
+        """Return bool for server state, None for a client-only predicate."""
+        kind = requirement['type']
+        if kind == 'pack':
+            return requirement['id'] in self.user.packs
+        if kind == 'single':
+            return requirement['id'] in self.user.singles
+        if kind == 'character':
+            return int(requirement['id']) in self.user.characters_list
+        if kind == 'chapter_step':
+            map_ids, positions = self.chapter_positions()
+            return sum(positions.get(map_id, 0) for map_id in map_ids) >= requirement['value']
+        if kind == 'chapter_maps':
+            map_ids, positions = self.chapter_positions()
+            certain = possible = 0
+            special_maps = {'tempestissimo', 'arcahv', 'finale', 'epilogue',
+                            'astralquant', 'lephon_nell', 'acheron'}
+            for map_id in map_ids:
+                raw = MapParser.get_world_info(map_id)
+                step_count = len(raw['steps'])
+                if map_id == 'lephon_nell':
+                    step_count = len(MapParser.get_lephon_nell_phase(self.user.lephon_nell_state))
+                if positions.get(map_id, 0) < step_count - 1:
+                    continue
+                possible += 1
+                if map_id not in special_maps or not (
+                        raw.get('require_localunlock_songid') or
+                        raw.get('require_localunlock_challengeid')):
+                    certain += 1
+            if certain >= requirement['value']:
+                return True
+            if possible < requirement['value']:
+                return False
+            return None
+        if kind in ('fragment', 'chart_unlock'):
+            return None
+        return True
+
+    def chapter_positions(self):
+        map_ids = [map_id for map_id in MapParser.chapter_info.get(self.chapter, [])
+                   if map_id != 'lephon_nell' or self.user.lephon_nell_state != 4]
+        self.c.execute('SELECT map_id, curr_position FROM user_world WHERE user_id=?',
+                       (self.user.user_id,))
+        return map_ids, dict(self.c.fetchall())
 
     def climb(self, step_value: float, user_play: any) -> None:
         """Climb the ladder; the value must be non-negative"""
@@ -477,11 +549,13 @@ class UserMap(Map):
             raise InputError("`Step_value` must be non-negative.")
 
         cur_step: "Step" = self.steps[self.curr_position]
-        user_lephon_nell_state = self.user.lephon_nell_state
+        user_lephon_nell_state = (
+            self.user.lephon_nell_state if self.map_id == "lephon_nell" else 0
+        )
 
         # Handle lephon_nell specific logic
         self.lephon_active = False
-        if self.user.current_map.map_id == "lephon_nell":
+        if self.map_id == "lephon_nell":
             if user_lephon_nell_state == 0:
                 if cur_step.step_type and "wall_impossible" in cur_step.step_type:
                     self.user.current_map.steps_modified = True
@@ -503,6 +577,19 @@ class UserMap(Map):
                 {"x": self.user.user_id, "y": user_lephon_nell_state},
             )
             self.select_map_info()
+
+            # The previous phase can end at a position that does not exist in
+            # the final phase's shorter step list. Move to the final phase
+            # entry tile before indexing into the new steps.
+            if (
+                user_lephon_nell_state == 3
+                and self.curr_position >= self.step_count
+            ):
+                self.curr_position = 65
+                self.curr_capture = 1
+                self.prev_capture = self.curr_capture
+                self.prev_position = self.curr_position
+                return
 
             x: "Step" = self.steps[self.curr_position]
             if x.step_type:
