@@ -74,7 +74,8 @@
             if (csrfMeta) {
                 var csrfToken = csrfMeta.getAttribute('content');
                 var addToken = function (form) {
-                    if (!form || (form.method || 'get').toLowerCase() !== 'post') return;
+                    // Use getAttribute: form.method is shadowed by controls named "method".
+                    if (!form || (form.getAttribute('method') || 'get').toLowerCase() !== 'post') return;
                     if (form.querySelector('input[name="_csrf_token"]')) return;
                     var input = document.createElement('input');
                     input.type = 'hidden';

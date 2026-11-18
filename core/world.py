@@ -561,12 +561,17 @@ class UserMap(Map):
                     self.user.current_map.steps_modified = True
                     user_lephon_nell_state = 1
 
-            # If alrrady on phase and not at final phase, we switch
-            if user_lephon_nell_state > 0 and user_lephon_nell_state < 3:
+            # If already on a phase and not at the final phase, we switch.
+            # This must be an ``elif``: when the phase-0 wall is hit above the
+            # state has just become 1, and advancing it again in the same call
+            # would skip the first phase entirely (0 -> 2).
+            elif 0 < user_lephon_nell_state < 3:
                 user_lephon_nell_state += 1
                 self.user.current_map.steps_modified = True
 
-            if user_lephon_nell_state != 0:
+            # State 4 means the map has been completed; there is no phase
+            # file for it, so keep using the base map definition.
+            if 0 < user_lephon_nell_state <= 3:
                 self.user.current_map.overwrite_steps = [
                     Step().from_dict(s)
                     for s in MapParser.get_lephon_nell_phase(user_lephon_nell_state)
@@ -577,6 +582,13 @@ class UserMap(Map):
                 {"x": self.user.user_id, "y": user_lephon_nell_state},
             )
             self.select_map_info()
+
+            # ``select`` computed the flags from the state stored in the
+            # database before this call. If the state changed above, refresh
+            # them so the response already tells the client that the final
+            # phase (HARD gauge) has been reached.
+            self.lephon_final = user_lephon_nell_state == 3
+            self.lephon_active = self.lephon_final
 
             # The previous phase can end at a position that does not exist in
             # the final phase's shorter step list. Move to the final phase
@@ -655,19 +667,14 @@ class UserMap(Map):
 
         if self.lephon_final:
             if user_play.clear_type == 0:
-                i = self.curr_position
-                j = self.curr_capture
-                remain_tiles = 13
-                while remain_tiles > 0:
-                    j -= self.steps[i].capture
-                    i -= 1
-                    remain_tiles -= 1
-                if i < 0:
-                    self.curr_position = 0
-                    self.curr_capture = 0
-                else:
-                    self.curr_position = i
-                    self.curr_capture = j
+                # Failing a song in the final phase moves the player back by
+                # 13 tiles. Land at the start of the destination tile instead
+                # of subtracting capture values, which used to read past the
+                # beginning of the step list (negative indexes) and produced
+                # negative ``curr_capture`` values the client could not apply.
+                i = max(self.curr_position - 13, 0)
+                self.curr_position = i
+                self.curr_capture = 0
             return
 
         if self.is_beyond:  # beyond check

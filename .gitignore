@@ -1,0 +1,12 @@
+# OS
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Runtime databases
+database/*.db
+database/backup/
